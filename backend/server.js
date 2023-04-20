@@ -203,6 +203,48 @@ app.get('/unpaid-orders', (req, res) => {
   });
 });
 
+// Get all tasks for a given client ID that are not paid
+app.get('/client/:clientId/tasks/unpaid', (req, res) => {
+  const clientId = req.params.clientId;
+  const sql = `SELECT * FROM task WHERE client_id = ? AND is_paid = 0`;
+  db.query(sql, [clientId], (err, result) => {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+//Get all unpaid task between two dates.
+app.get('/tasks/unpaid/:startDate/:endDate', (req, res) => {
+  const startDate = req.params.startDate;
+  const endDate = req.params.endDate;
+  const sql = `SELECT * FROM task WHERE is_paid = 0 AND date_submitted BETWEEN ? AND ?`;
+  db.query(sql, [startDate, endDate], (err, result) => {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+// Get all unpaid tasks for a given client name
+app.get('/tasks/unpaid/:clientName', (req, res) => {
+  const clientName = req.params.clientName;
+  const sql = ` SELECT task.* FROM task INNER JOIN client ON task.client_id = client.id
+    WHERE client.name LIKE ? AND task.is_paid = 0`;
+  db.query(sql, [`%${clientName}%`], (err, result) => {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+
 app.listen(port, () => {
   console.log(`IMS app listening at http://localhost:${port}`);
 });
