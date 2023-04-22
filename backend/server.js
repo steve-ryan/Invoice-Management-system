@@ -47,10 +47,13 @@ app.post("/admin/register", (req, res) => {
 
 // Login admin
 app.post("/admin/login", (req, res) => {
-  const { name, password } = req.body;
-  const sql = "SELECT * FROM admin WHERE name=?";
-  db.query(sql, name, (err, result) => {
-    if (err) throw err;
+  const { username, password } = req.body;
+  const sql = `SELECT * FROM admin WHERE name = ?`;
+  db.query(sql, [username], (err, result) => {
+    if (err)
+    {
+      res.status(500).send(err.message);
+    }
     if (result.length === 0) {
       return res.status(401).send("Invalid name or password");
     }
